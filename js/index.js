@@ -1,6 +1,4 @@
 
-var level0Notes = [60, 61, 62, 63, 64, 65, 66, 67]; // middle C - G
-var level1Notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72];
 var noteIndex = 0;
 var correctNotes = 0;
 
@@ -14,9 +12,8 @@ if (navigator.requestMIDIAccess) {
 }
 
 function onMIDISuccess(midiAccess) {
-    shuffleArray(level1Notes);
-    drawNote(level1Notes[noteIndex]);
-    
+    drawNote();
+
     var inputs = midiAccess.inputs;
     var outputs = midiAccess.outputs;
 
@@ -36,38 +33,28 @@ function getMIDIMessage(message) {
 
     switch (command) {
         case 144: // noteOn
-            document.querySelector('.note-info').textContent = 'Command: ' + command +
-                ' , Note: ' + note + ' , Velocity: ' + velocity;
             noteOnListener(note);
             break;
     }
 }
 
-function getNoteNameFromNumber(noteNum) {
-    var notes = "C C#D D#E F F#G G#A A#B ";
-    var octave;
-    var note;
-
-    octave = Math.floor(noteNum / 12 - 1);
-    note = notes.substring((noteNum % 12) * 2, (noteNum % 12) * 2 + 2);
-
-   return note;
-
-}
-
-function drawNote(noteNum) {
+function drawNote() {
     /** reset sharps, special line notes **/
-    document.querySelector(".accidental").classList.remove('sharp61','sharp63', 'sharp66', 'sharp68', 'sharp70');
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+    noteNum = 60 +getRandomInt(18)
+    document.querySelector(".accidental").style["display"] = "none"
     document.querySelector("#whole-note").classList.remove('whole-note-line');
-   
+
     /* draw basic note */
     document.querySelector("#whole-note").classList.add('whole-note');
-    document.querySelector('.whole-note').classList.add('note'+noteNum);
+    document.querySelector("#notee").style["top"] = {60:218,61:218,62:201,63:201,64:184,65:162,66:162,67:141,68:141,69:119,70:119,71:97,72:76,73:76,74:55,75:55,76:33,77:11,78:11}[noteNum] + "px"
 
     if (isSharp(noteNum)) {
-        document.querySelector(".accidental").classList.add('sharp'+noteNum);
+        document.querySelector(".accidental").style["display"] = "block"
     } 
-    if (isSpecialLineNote(noteNum)) {
+    if ([60,61].includes(noteNum)) {
         document.querySelector("#whole-note").setAttribute("src", "./images/wholenoteline.svg");
         document.querySelector("#whole-note").classList.add("whole-note-line");
     } else {
@@ -84,6 +71,9 @@ function isSharp(noteNum) {
         case 66:
         case 68:
         case 70:
+        case 73:
+        case 75:
+        case 78:
             sharp = true;
             break;
         default:
@@ -92,54 +82,20 @@ function isSharp(noteNum) {
     return sharp;
 }
 
-function isSpecialLineNote(noteNum) {
-    var lineNote = false;
-    switch (noteNum) {
-        case 60:
-        case 61:  
-            lineNote = true;
-            break;
-        default: 
-            break;
-    }
-    return lineNote;
-}
 
 function noteOnListener(note) {
-   /* check for special notes first */
-   if (note >= 41 && note <=47) { // change bg color!
-        var rainbow = ["#d10000", "#ff6622", "#ffda21", "#33dd00", "#1133cc", "#220066", "#330044"];
-        document.querySelector("body").style.background = rainbow[note - 41];
-   } else {
-        if (note == level1Notes[noteIndex]) {
-            document.querySelector('.accidental').classList.add('correct');
-            document.querySelector('#whole-note').classList.add('correct');
-            correctNotes++;
-        } else {
-            document.querySelector('.accidental').classList.add('wrong');
-            document.querySelector("#whole-note").classList.add('wrong');
-        }
-        window.setTimeout(function(){
-            if (noteIndex < level1Notes.length - 1) {
-                noteIndex++;
-                document.querySelector('.accidental').classList.remove('correct', 'wrong');
-                document.querySelector('#whole-note').classList.remove('correct', 'wrong');
-                document.querySelector('.note-info').textContent = '';
-                document.querySelector('.whole-note').classList.remove('note'+level1Notes[noteIndex-1]);
-                drawNote(level1Notes[noteIndex]);
-            } else {
-                document.querySelector('.note-info').textContent = 'You played ' + correctNotes + ' out of ' + level1Notes.length + ' notes correctly.';
-            }
-        }, 1500); 
-   }
-
-      
-}
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    console.log(note)
+    if (note == noteNum) {
+        next_note()
     }
+
+
 }
+
+function next_note(){
+                drawNote();
+
+
+}
+
 
